@@ -129,6 +129,6 @@ I still have to add an "email when complete option".
 
 I'd like to add an option for a "cleanup" step that completes when all the array jobs have finished;
 by default it could auto-analyze the memory and time usage for each command, and/or remove
-the rundir (with an additional "quiet" flag), but maybe could be used for other post-jobs-completion
+the rundir (when used with an additional "quiet" flag), but maybe could be used for user-specified post-jobs-completion
 tasks as well. (Heck, why not "pre-array" and "post-array" phases. Hmm.) This will require some
 sophisticated usage of task dependency in SGE though.
