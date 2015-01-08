@@ -153,7 +153,7 @@ def write_qsub(args):
 
 ## executes qsub args.rundir/args.rundir.sh
 def exec_qsub(args):
-	res = subprocess.check_output("qsub '" + args.rundir + "/" + args.rundir + ".sh'", shell = True)
+	res = subprocess.check_output("qsub '" + args.rundir + "/" + args.rundir + ".sh'", stderr=subprocess.STDOUT, shell = True)
 	print(res)
 
 args = parse_input()
