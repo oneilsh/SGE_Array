@@ -146,7 +146,7 @@ def write_qsub(args):
 
 	if args.queue != None:
 		scripth.write("# Set queues to use \n")
-		scripth.write("#$ -1 " + str(args.queue) + "\n")
+		scripth.write("#$ -q " + str(args.queue) + "\n")
 		scripth.write("# \n")
 
 	scripth.write("# Set filelimit \n")
