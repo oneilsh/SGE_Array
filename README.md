@@ -1,4 +1,4 @@
-# SGE_Parallel
+# SGE_Array
 
 #### Submitting a list of commands as an array job to SGE. Easily.
 
@@ -27,19 +27,19 @@ there you could just make the file an executable shell script, or even pipe it r
 `cat commands.txt | bash`. But what if you want to run these via SGE?
 
 Probably, you should run them as an array job (because using a loop to submit them as individual jobs is NOT GOOD, ok?),
-but this means using the clunky `$SGE_TASK_ID` syntax, which will only take numerals. `SGE_Parallel` is
+but this means using the clunky `$SGE_TASK_ID` syntax, which will only take numerals. `SGE_Array` is
 to your rescue: it takes a list of commands (either as a file, or on stdin) and turns them into an array job. Boom.
 
 ```
-cat commands.txt | SGE_Parallel
+cat commands.txt | SGE_Array
 
 # or
 
-SGE_Parallel -c commands.txt
+SGE_Array -c commands.txt
 
 # what about?
 
-ls -1 *.fasta | awk '{print "runAssembly " $1 " -o " $1 ".out"}' | SGE_Parallel
+ls -1 *.fasta | awk '{print "runAssembly " $1 " -o " $1 ".out"}' | SGE_Array
 ```
 
 ### Reasonable Defaults and Cool Features
@@ -59,12 +59,12 @@ with the already existing `SGE_Plotdir` which reports RAM and time usage for eac
 Most of this can be changed, here's the help output:
 
 ```
-usage: SGE_Parallel [-h] [-c COMMANDSFILE] [-q QUEUE] [-m MEMORY]
+usage: SGE_Array [-h] [-c COMMANDSFILE] [-q QUEUE] [-m MEMORY]
                     [-f FILELIMIT] [-b CONCURRENCY] [-P PROCESSORS]
                     [-r RUNDIR] [-p PATH] [-v] [--showchangelog]
 
 Runs a list of commands specified on stdin as an SGE array job. Example usage:
-cat `commands.txt | SGE_Parallel` or `SGE_Parallel -c commands.txt`
+cat `commands.txt | SGE_Array` or `SGE_Array -c commands.txt`
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -107,21 +107,21 @@ using environment variables right on the command-line, or you want to use | or >
 This means shell autocompletion will work!
 
 ```
-echo runAssembly input.fasta -o assembly_output | SGE_Parallel
+echo runAssembly input.fasta -o assembly_output | SGE_Array
 ```
 
 If your command needs funky shell stuff, you'll have to make sure `echo` can print it properly, by escaping
 or falling back to using quotes
 
 ```
-echo runAssembly input.fasta -o assembly_output	\> log.txt | SGE_Parallel
-echo 'runAssembly input.fasta -o assembly_output > log.txt' | SGE_Parallel
+echo runAssembly input.fasta -o assembly_output	\> log.txt | SGE_Array
+echo 'runAssembly input.fasta -o assembly_output > log.txt' | SGE_Array
 ```
 
 
 ### Future Directions
 
-I'd like to have the thing read a config file called `.sge_parallel` in `$HOME` so that the defaults
+I'd like to have the thing read a config file called `.SGE_Array` in `$HOME` so that the defaults
 for the options (`--path`, `--queue`, `--memory` etc.) can be adjusted to minimize typing in
 day-to-day usage.
 
