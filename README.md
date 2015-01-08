@@ -3,7 +3,7 @@
 #### Submitting a list of commands as an array job to SGE. Easily.
 
 Note: This software is intended for use on the [CGRB](http://shell.cgrb.oregonstate.edu) infrastructure,
-and may not work well on other SGE installations. 
+and may not work well on other SGE installations. It comes with no warranty or gaurantee of effectiveness.
 
 ### Overview
 
