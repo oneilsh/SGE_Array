@@ -13,7 +13,7 @@ import textwrap
 ### Input parsing. Returns an environment with members like args.queue, args.commands, args.filelimit, etc. 
 def parse_input():
 	
-	parser = argparse.ArgumentParser(description='Runs a list of commands specified on stdin as an SGE array job. \nExample usage: cat commands.txt | SGE_Parallel')
+	parser = argparse.ArgumentParser(description='Runs a list of commands specified on stdin as an SGE array job. \nExample usage: `cat commands.txt | SGE_Parallel` or SGE_Parallel -c commands.txt')
 	parser.add_argument('-c', '--commandsfile', required = False, dest = "commandsfile", default = "-", help = "The file to read commands from. Default: -, meaning standard input.")
 	parser.add_argument('-q', '--queue', required = False, dest = "queue", help = "The queue(s) to send the commands to. Default: all queues you have access to.")
 	parser.add_argument('-m', '--memory', required = False, dest = "memory", default = "4G", help = "Amount of free RAM to request for each command, and the maximum that each can use without being killed. Default: 4G")
@@ -155,7 +155,11 @@ def write_qsub(args):
 def exec_qsub(args):
 	res = ""
 	try:
-		res = subprocess.check_output("qsub '" + args.rundir + "/" + args.rundir + ".sh'", stderr=subprocess.STDOUT, shell = True)
+		res = subprocess.check_output("qsub '" + args.rundir + "/" + args.rundir + ".sh'", shell = True)
+	except subprocess.CalledProcessError as exc:
+		print("Problem submmitting. Are you sure you're on a machine from which SGE jobs can be submitted? qsub returncode: " + str(exc.returncode))
+		quit()
+		
 	print(res)
 
 args = parse_input()
