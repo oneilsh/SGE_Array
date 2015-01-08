@@ -125,4 +125,10 @@ I'd like to have the thing read a config file called `.sge_parallel` in `$HOME` 
 for the options (`--path`, `--queue`, `--memory` etc.) can be adjusted to minimize typing in
 day-to-day usage.
 
+I still have to add an "email when complete option".
 
+I'd like to add an option for a "cleanup" step that completes when all the array jobs have finished;
+by default it could auto-analyze the memory and time usage for each command, and/or remove
+the rundir (with an additional "quiet" flag), but maybe could be used for other post-jobs-completion
+tasks as well. (Heck, why not "pre-array" and "post-array" phases. Hmm.) This will require some
+sophisticated usage of task dependency in SGE though.
