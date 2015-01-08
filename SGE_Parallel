@@ -1,4 +1,32 @@
 #!/usr/bin/env python2.7
+
+# Written by Shawn O'Neil, CGRB, OSU, Jan 2014
+#This software is not free.
+
+#This software program and documentation are copyrighted by 
+#Oregon State University. The software program and 
+#documentation are supplied "as is", without any accompanying 
+#services from Oregon State University. OSU does not warrant 
+#that the operation of the program will be uninterrupted or 
+#error-free. The end-user understands that the program was 
+#developed for research purposes and is advised not to rely 
+#exclusively on the program for any reason.
+
+#IN NO EVENT SHALL OREGON STATE UNIVERSITY BE LIABLE TO ANY 
+#PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR 
+#CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF 
+#THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF 
+#OREGON STATE UNIVERSITYHAS BEEN ADVISED OF THE POSSIBILITY OF 
+#SUCH DAMAGE. OREGON STATE UNIVERSITY SPECIFICALLY DISCLAIMS 
+#ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+#PURPOSE AND ANY STATUTORY WARRANTY OF NON-INFRINGEMENT. THE 
+#SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND 
+#OREGON STATE UNIVERSITY HAS NO OBLIGATIONS TO PROVIDE 
+#MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR 
+#MODIFICATIONS.
+
+
 import sys
 import io
 import re
@@ -13,7 +41,7 @@ import textwrap
 ### Input parsing. Returns an environment with members like args.queue, args.commands, args.filelimit, etc. 
 def parse_input():
 	
-	parser = argparse.ArgumentParser(description='Runs a list of commands specified on stdin as an SGE array job. \nExample usage: `cat commands.txt | SGE_Parallel` or SGE_Parallel -c commands.txt')
+	parser = argparse.ArgumentParser(description='Runs a list of commands specified on stdin as an SGE array job. \nExample usage: cat `commands.txt | SGE_Parallel` or `SGE_Parallel -c commands.txt`')
 	parser.add_argument('-c', '--commandsfile', required = False, dest = "commandsfile", default = "-", help = "The file to read commands from. Default: -, meaning standard input.")
 	parser.add_argument('-q', '--queue', required = False, dest = "queue", help = "The queue(s) to send the commands to. Default: all queues you have access to.")
 	parser.add_argument('-m', '--memory', required = False, dest = "memory", default = "4G", help = "Amount of free RAM to request for each command, and the maximum that each can use without being killed. Default: 4G")
