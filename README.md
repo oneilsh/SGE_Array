@@ -132,3 +132,6 @@ by default it could auto-analyze the memory and time usage for each command, and
 the rundir (when used with an additional "quiet" flag), but maybe could be used for user-specified post-jobs-completion
 tasks as well. (Heck, why not "pre-array" and "post-array" phases. Hmm.) This will require some
 sophisticated usage of task dependency in SGE though.
+
+Could also be cool to have an option like "hold these jobs until the last set I ran
+has finished."
