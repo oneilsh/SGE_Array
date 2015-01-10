@@ -79,8 +79,9 @@ def parse_input():
 
 	args.commands = cmds
 
-	## grab the first word of the first command
+	## grab the executable of the first word of the first command
 	cmd = re.split(r"\s+", cmds[0])[0]
+	cmd = os.path.basename(cmd)
 	cmd = re.subn(r"[^A-Za-z0-9]", "", cmd)[0]
 	args.timestamp = datetime.datetime.now().strftime("j%Y-%m-%d_%H-%M-%S_" + cmd + "_etal")
 	## Set the rundir and path if not already set
