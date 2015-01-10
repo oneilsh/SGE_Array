@@ -1,0 +1,42 @@
+#!/usr/bin/env python2.7
+import time
+import subprocess
+import sys
+import gc
+
+starttimesecs = time.time()
+
+if(len(sys.argv) < 3):
+	print("usage: ./usemem <gigstouse> <secondstospinat100%cpu>");
+	print("Note that this program may run for longer than the time specified, as it takes time to fill up the memory")
+	quit()
+
+gigstouse = float(sys.argv[1])
+secondstospin = float(sys.argv[2])
+
+## python uses about 8 bytes per 1
+## (note: this is because python pre-allocates and references
+## some integers, including 1; in general, each element of a list is larger
+## even if they are integers
+numels = int(1073741824.0*gigstouse/8.0)
+largeList = [1]*numels;
+
+largeList = list()
+gc.collect()
+
+print("Used mem, spinlooping...")
+dummyvar = 0
+## use some CPU for 10 seconds...
+while(time.time() - starttimesecs < secondstospin):
+	dummyvar = dummyvar + 1
+
+quit() # perhaps later we can ask it to write large files...
+
+file1 = open("file1", 'w');
+file1.write(result);
+file1.close();
+
+file2 = open("file2", 'w');
+file2.write(result);
+file2.close();
+

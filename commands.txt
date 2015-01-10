@@ -1,4 +1,3 @@
-echo 1 > 1.txt
-echo 2 > 2.txt
-echo 3 > 3.txt
-echo 4 > 4.txt
+./usemem_spinloop 1 10
+./usemem_spinloop 2 15
+./usemem_spinloop 3 30
