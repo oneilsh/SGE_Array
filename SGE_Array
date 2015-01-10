@@ -50,6 +50,7 @@ def parse_input():
 	parser.add_argument('-P', '--processors', required = False, dest = "processors", default = "1", help = "Number of processors to reserve for each command. Default: 1")
 	parser.add_argument('-r', '--rundir', required = False, dest = "rundir", help = "Job name and the directory to create or OVERWRITE to store log information and standard output of the commands. Default: 'jYEAR-MON-DAY_HOUR-MIN-SEC_<cmd>_etal' where <cmd> is the first word of the first command.")
 	parser.add_argument('-p', '--path', required = False, dest = "path", help = "What to use as the PATH for the commands. Default: whatever is output by echo $PATH.")
+	parser.add_argument('--hold', required = False, action = 'store_true', dest = "hold", help = "Hold the execution for these commands until all previous jobs arrays run from this directory have finished.")
 	parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 0.6')
 	parser.add_argument('--showchangelog', required = False, action = 'store_true', dest = "showchangelog", help = "Show the changelog for this program.")
 
@@ -77,9 +78,10 @@ def parse_input():
 
 	args.commands = cmds
 
+	args.timestamp = datetime.datetime.now().strftime("j%Y-%m-%d_%H-%M-%S_" + re.split("\s+", cmds[0])[0] + "_etal")
 	## Set the rundir and path if not already set
 	if args.rundir == None:
-		rundir = datetime.datetime.now().strftime("j%Y-%m-%d_%H-%M-%S_" + re.split("\s+", cmds[0])[0] + "_etal")
+		rundir = args.timestamp
 		args.rundir = rundir
 	if args.path == None:
 		args.path = os.environ['PATH']	
@@ -172,7 +174,7 @@ def write_qsub(args):
 	scripth.write("# Run the command through time with memory and such reporting. \n")
 	scripth.write("# warning: there is an old bug in GNU time that overreports memory usage \n")
 	scripth.write("# by 4x; this is compensated for in the SGE_Plotdir script. \n")
-	scripth.write("time -f \" \\\\tFull Command:                      %C \\\\n\\\\tMemory (kb):                       %M \\\\n\\\\t# SWAP  (freq):                    %W \\\\n\\\\t# Waits (freq):                    %w \\\\n\\\\tCPU (percent):                     %P \\\\n\\\\tTime (seconds):                    %e \\\\n\\\\tTime (hh:mm:ss.ms):                %E \\\\n\\\\tSystem CPU Time (seconds):         %S \\\\n\\\\tUser   CPU Time (seconds):         %U \" \\ \n")
+	scripth.write("/usr/bin/env time -f \" \\\\tFull Command:                      %C \\\\n\\\\tMemory (kb):                       %M \\\\n\\\\t# SWAP  (freq):                    %W \\\\n\\\\t# Waits (freq):                    %w \\\\n\\\\tCPU (percent):                     %P \\\\n\\\\tTime (seconds):                    %e \\\\n\\\\tTime (hh:mm:ss.ms):                %E \\\\n\\\\tSystem CPU Time (seconds):         %S \\\\n\\\\tUser   CPU Time (seconds):         %U \" \\\n")
 	scripth.write("sed \"$SGE_TASK_ID q;d\" " + args.rundir + "/commands.txt | bash -e \n")
 	scripth.write("echo \"  Finished at:           \" `date` \n")
 	
@@ -183,12 +185,14 @@ def write_qsub(args):
 def exec_qsub(args):
 	res = ""
 	try:
-		res = subprocess.check_output("qsub '" + args.rundir + "/" + args.rundir + ".sh'", shell = True)
+		res = subprocess.check_output("qsub -terse '" + args.rundir + "/" + args.rundir + ".sh'", shell = True)
 	except subprocess.CalledProcessError as exc:
 		print("Problem submmitting. Are you sure you're on a machine from which SGE jobs can be submitted? qsub returncode: " + str(exc.returncode))
 		quit()
-		
-	print(res)
+	
+	jobnum = res.strip()
+	print("Successfully submitted job " + jobnum + ", logging job number, timestamp, and rundir to .sge_array_jobnums")
+	subprocess.check_output("echo " + jobnum + "\t" + args.timestamp + "\t" + args.rundir + ">> .sge_array_jobnums", shell = True)
 
 args = parse_input()
 make_rundir(args.rundir)
