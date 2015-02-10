@@ -198,8 +198,12 @@ def write_qsub(args):
 	scripth.write("# Run the command through time with memory and such reporting. \n")
 	scripth.write("# warning: there is an old bug in GNU time that overreports memory usage \n")
 	scripth.write("# by 4x; this is compensated for in the SGE_Plotdir script. \n")
+	scripth.write("cmdcmd=`sed \"$SGE_TASK_ID q;d\" " + args.rundir + "/commands.txt`\n")
+	scripth.write("echo \#!/usr/bin/env bash > " + args.rundir + "/command.$SGE_TASK_ID.txt\n")
+	scripth.write("echo $cmdcmd >> " + args.rundir + "/command.$SGE_TASK_ID.txt\n")
+	scripth.write("chmod u+x " + args.rundir + "/command.$SGE_TASK_ID.txt\n")
 	scripth.write("/usr/bin/env time -f \" \\\\tFull Command:                      %C \\\\n\\\\tMemory (kb):                       %M \\\\n\\\\t# SWAP  (freq):                    %W \\\\n\\\\t# Waits (freq):                    %w \\\\n\\\\tCPU (percent):                     %P \\\\n\\\\tTime (seconds):                    %e \\\\n\\\\tTime (hh:mm:ss.ms):                %E \\\\n\\\\tSystem CPU Time (seconds):         %S \\\\n\\\\tUser   CPU Time (seconds):         %U \" \\\n")
-	scripth.write("`sed \"$SGE_TASK_ID q;d\" " + args.rundir + "/commands.txt`\n")
+	scripth.write(args.rundir + "/command.$SGE_TASK_ID.txt\n")
 	scripth.write("echo \"  Finished at:           \" `date` \n")
 	
 	scripth.close()
