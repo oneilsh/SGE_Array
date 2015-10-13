@@ -53,10 +53,11 @@ def parse_input():
 	parser.add_argument('--hold', required = False, action = 'store_true', dest = "hold", help = "Hold the execution for these commands until all previous jobs arrays run from this directory have finished. Uses the list of jobs as logged to .sge_array_jobnums.")
 	parser.add_argument('--hold_jids', required = False, dest = "hold_jid_list", help = "Hold the execution for these commands until these specific job IDs have finished (e.g. '--hold_jid 151235' or '--hold_jid 151235,151239' )")
 	parser.add_argument('--hold_names', required = False, dest = "hold_name_list", help = "Hold the execution for these commands until these specific job IDs have finished (e.g. 'SGE_Array -c commands.txt -r this_job_name --hold_names previous_job_name'). Uses job information as logged to .sge_array_jobnums. Currently only holds for most recent job with given name(s).")
-	parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 0.6.7')
+	parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 0.6.7.1')
 	parser.add_argument('--showchangelog', required = False, action = 'store_true', dest = "showchangelog", help = "Show the changelog for this program.")
 
 	changelog = textwrap.dedent('''\
+		Version 0.6.7.1: Fixed the -r option to now accept paths. e.g SGE_Array -c commands.txt -r logs_dir/log_dir. The "name" of the job (for --hold_names purposes) is logs_dir/log_dir; the SGE name is just log_dir.
 		Version 0.6.7: Added new option --hold_names for holding for specific job names.
 		Version 0.6.6: Added new option --hold_jid for holding for specific job ids (in addition to --hold which holds for all jobs previously run in the current dir.)
 		Version 0.6.5: Fixed some bugs, also, new option --hold
@@ -155,7 +156,7 @@ def write_commands(cmds, rundir):
 
 ########## write the qsub script to args.rundir/args.rundir.sh
 def write_qsub(args):
-	scripth = io.open(args.rundir + "/" + args.rundir + ".sh", "wb")
+	scripth = io.open(args.rundir + "/" + os.path.basename(args.rundir) + ".sh", "wb")
 
 	scripth.write(textwrap.dedent('''\
 		#!/usr/bin/env bash
@@ -170,7 +171,7 @@ def write_qsub(args):
 		#$ -S /bin/bash
 		# \n'''))
 	scripth.write("# Set job name \n")
-	scripth.write("#$ -N " + str(args.rundir) + "\n")
+	scripth.write("#$ -N " + str(os.path.basename(args.rundir)) + "\n")
 	scripth.write("# \n")
 
 	scripth.write("# Set task concurrency (max array jobs running simultaneously) \n")
@@ -246,7 +247,7 @@ def write_qsub(args):
 def exec_qsub(args):
 	res = ""
 	try:
-		res = subprocess.check_output("qsub -terse '" + args.rundir + "/" + args.rundir + ".sh'", shell = True)
+		res = subprocess.check_output("qsub -terse '" + args.rundir + "/" + os.path.basename(args.rundir) + ".sh'", shell = True)
 	except subprocess.CalledProcessError as exc:
 		print("Problem submmitting. Are you sure you're on a machine from which SGE jobs can be submitted? qsub returncode: " + str(exc.returncode))
 		shutil.rmtree(args.rundir)
