@@ -57,7 +57,7 @@ def parse_input():
 	parser.add_argument('--showchangelog', required = False, action = 'store_true', dest = "showchangelog", help = "Show the changelog for this program.")
 
 	changelog = textwrap.dedent('''\
-		Version 0.6.7: Added new option --hold_names for holding for specific job names 
+		Version 0.6.7: Added new option --hold_names for holding for specific job names.
 		Version 0.6.6: Added new option --hold_jid for holding for specific job ids (in addition to --hold which holds for all jobs previously run in the current dir.)
 		Version 0.6.5: Fixed some bugs, also, new option --hold
 		Version 0.6: Initial version. Reads commands on stdin or from a file, runs them as an array job.
