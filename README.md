@@ -61,7 +61,8 @@ Most of this can be changed, here's the help output:
 ```
 usage: SGE_Array [-h] [-c COMMANDSFILE] [-q QUEUE] [-m MEMORY] [-f FILELIMIT]
                  [-b CONCURRENCY] [-P PROCESSORS] [-r RUNDIR] [-p PATH]
-                 [--hold] [--hold_jid HOLD_JID_LIST] [-v] [--showchangelog]
+                 [--hold] [--hold_jids HOLD_JID_LIST]
+                 [--hold_names HOLD_NAME_LIST] [-v] [--showchangelog]
 
 Runs a list of commands specified on stdin as an SGE array job. Example usage:
 cat `commands.txt | SGE_Array` or `SGE_Array -c commands.txt`
@@ -99,13 +100,18 @@ optional arguments:
   --hold                Hold the execution for these commands until all
                         previous jobs arrays run from this directory have
                         finished. Uses the list of jobs as logged to
-                        .sge_array_jobnums filetss_get_seqs.pl
-                        aligned.peaks_annotated 3000 3000 tair10/genome.fas >
-                        peaks_3000_region.fa # was promoter_roe_seqs.
-  --hold_jid HOLD_JID_LIST
+                        .sge_array_jobnums.
+  --hold_jids HOLD_JID_LIST
                         Hold the execution for these commands until these
                         specific job IDs have finished (e.g. '--hold_jid
                         151235' or '--hold_jid 151235,151239' )
+  --hold_names HOLD_NAME_LIST
+                        Hold the execution for these commands until these
+                        specific job IDs have finished (e.g. 'SGE_Array -c
+                        commands.txt -r this_job_name --hold_names
+                        previous_job_name'). Uses job information as logged to
+                        .sge_array_jobnums. Currently only holds for most
+                        recent job with given name(s).
   -v, --version         show program's version number and exit
   --showchangelog       Show the changelog for this program.
 ```
