@@ -59,9 +59,9 @@ with the already existing `SGE_Plotdir` which reports RAM and time usage for eac
 Most of this can be changed, here's the help output:
 
 ```
-usage: SGE_Array [-h] [-c COMMANDSFILE] [-q QUEUE] [-m MEMORY]
-                    [-f FILELIMIT] [-b CONCURRENCY] [-P PROCESSORS]
-                    [-r RUNDIR] [-p PATH] [-v] [--showchangelog]
+usage: SGE_Array [-h] [-c COMMANDSFILE] [-q QUEUE] [-m MEMORY] [-f FILELIMIT]
+                 [-b CONCURRENCY] [-P PROCESSORS] [-r RUNDIR] [-p PATH]
+                 [--hold] [--hold_jid HOLD_JID_LIST] [-v] [--showchangelog]
 
 Runs a list of commands specified on stdin as an SGE array job. Example usage:
 cat `commands.txt | SGE_Array` or `SGE_Array -c commands.txt`
@@ -96,6 +96,16 @@ optional arguments:
                         first command.
   -p PATH, --path PATH  What to use as the PATH for the commands. Default:
                         whatever is output by echo $PATH.
+  --hold                Hold the execution for these commands until all
+                        previous jobs arrays run from this directory have
+                        finished. Uses the list of jobs as logged to
+                        .sge_array_jobnums filetss_get_seqs.pl
+                        aligned.peaks_annotated 3000 3000 tair10/genome.fas >
+                        peaks_3000_region.fa # was promoter_roe_seqs.
+  --hold_jid HOLD_JID_LIST
+                        Hold the execution for these commands until these
+                        specific job IDs have finished (e.g. '--hold_jid
+                        151235' or '--hold_jid 151235,151239' )
   -v, --version         show program's version number and exit
   --showchangelog       Show the changelog for this program.
 ```
@@ -127,11 +137,3 @@ day-to-day usage.
 
 I still have to add an "email when complete option".
 
-I'd like to add an option for a "cleanup" step that completes when all the array jobs have finished;
-by default it could auto-analyze the memory and time usage for each command, and/or remove
-the rundir (when used with an additional "quiet" flag), but maybe could be used for user-specified post-jobs-completion
-tasks as well. (Heck, why not "pre-array" and "post-array" phases. Hmm.) This will require some
-sophisticated usage of task dependency in SGE though.
-
-Could also be cool to have an option like "hold these jobs until the last set I ran
-has finished."

@@ -50,11 +50,13 @@ def parse_input():
 	parser.add_argument('-P', '--processors', required = False, dest = "processors", default = "1", help = "Number of processors to reserve for each command. Default: 1")
 	parser.add_argument('-r', '--rundir', required = False, dest = "rundir", help = "Job name and the directory to create or OVERWRITE to store log information and standard output of the commands. Default: 'jYEAR-MON-DAY_HOUR-MIN-SEC_<cmd>_etal' where <cmd> is the first word of the first command.")
 	parser.add_argument('-p', '--path', required = False, dest = "path", help = "What to use as the PATH for the commands. Default: whatever is output by echo $PATH.")
-	parser.add_argument('--hold', required = False, action = 'store_true', dest = "hold", help = "Hold the execution for these commands until all previous jobs arrays run from this directory have finished. Uses the list of jobs as logged to .sge_array_jobnums file.")
+	parser.add_argument('--hold', required = False, action = 'store_true', dest = "hold", help = "Hold the execution for these commands until all previous jobs arrays run from this directory have finished. Uses the list of jobs as logged to .sge_array_jobnums filetss_get_seqs.pl aligned.peaks_annotated 3000 3000 tair10/genome.fas > peaks_3000_region.fa  # was promoter_roe_seqs.")
+	parser.add_argument('--hold_jid', required = False, dest = "hold_jid_list", help = "Hold the execution for these commands until these specific job IDs have finished (e.g. '--hold_jid 151235' or '--hold_jid 151235,151239' )")
 	parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 0.6.5')
 	parser.add_argument('--showchangelog', required = False, action = 'store_true', dest = "showchangelog", help = "Show the changelog for this program.")
 
 	changelog = textwrap.dedent('''\
+		Version 0.6.6: Added new option --hold_jid for holding for specific job ids (in addition to --hold which holds for all jobs previously run in the current dir.)
 		Version 0.6.5: Fixed some bugs, also, new option --hold
 		Version 0.6: Initial version. Reads commands on stdin or from a file, runs them as an array job.
 		''')
@@ -168,10 +170,16 @@ def write_qsub(args):
 		scripth.write("#$ -q " + str(args.queue) + "\n")
 		scripth.write("# \n")
 
-	if args.hold:
-		holdfor = get_hold_jobs()
-		if len(holdfor) > 0:
-			scripth.write("# Hold for these job numbers, from .sge_array_jobnums \n")
+	# if holding...
+	if args.hold or args.hold_jid_list != None:
+		holdfor = list()
+		if args.hold_jid_list != None:           # hold for specific jobs
+			holdfor.append(args.hold_jid_list)
+		if args.hold:                            # hold for all previous jobs
+			prev_jobs = get_hold_jobs()
+			holdfor.extend(prev_jobs)
+		if len(holdfor) > 0:                    # if there's anything to hold for, actually do a hold ;)
+			scripth.write("# Hold for these job numbers, from .sge_array_jobnums and --hold_jid \n")
 			scripth.write("#$ -hold_jid " + ",".join(holdfor) + "\n")
 			scripth.write("# \n")
 
