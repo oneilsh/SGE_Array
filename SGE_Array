@@ -52,11 +52,12 @@ def parse_input():
 	parser.add_argument('-p', '--path', required = False, dest = "path", help = "What to use as the PATH for the commands. Default: whatever is output by echo $PATH.")
 	parser.add_argument('--hold', required = False, action = 'store_true', dest = "hold", help = "Hold the execution for these commands until all previous jobs arrays run from this directory have finished. Uses the list of jobs as logged to .sge_array_jobnums.")
 	parser.add_argument('--hold_jids', required = False, dest = "hold_jid_list", help = "Hold the execution for these commands until these specific job IDs have finished (e.g. '--hold_jid 151235' or '--hold_jid 151235,151239' )")
-	parser.add_argument('--hold_names', required = False, dest = "hold_name_list", help = "Hold the execution for these commands until these specific job IDs have finished (e.g. 'SGE_Array -c commands.txt -r this_job_name --hold_names previous_job_name'). Uses job information as logged to .sge_array_jobnums. Currently only holds for most recent job with given name(s).")
-	parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 0.6.7.1')
+	parser.add_argument('--hold_names', required = False, dest = "hold_name_list", help = "Hold the execution for these commands until these specific job names have finished (comma-sep list); accepts regular expressions. (e.g. 'SGE_Array -c commands.txt -r this_job_name --hold_names previous_job_name,other_jobs_.+'). Uses job information as logged to .sge_array_jobnums.")
+	parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 0.6.8')
 	parser.add_argument('--showchangelog', required = False, action = 'store_true', dest = "showchangelog", help = "Show the changelog for this program.")
 
 	changelog = textwrap.dedent('''\
+		Version 0.6.8: --hold_names option now accepts regular expressions for holding against sets of jobs easily. Eg. --hold_names assembly_.+
 		Version 0.6.7.1: Fixed the -r option to now accept paths. e.g SGE_Array -c commands.txt -r logs_dir/log_dir. The "name" of the job (for --hold_names purposes) is logs_dir/log_dir; the SGE name is just log_dir.
 		Version 0.6.7: Added new option --hold_names for holding for specific job names.
 		Version 0.6.6: Added new option --hold_jid for holding for specific job ids (in addition to --hold which holds for all jobs previously run in the current dir.)
@@ -125,10 +126,20 @@ def get_hold_jobs_by_names(names):
 	
 	names_list = names.split(',')
 	for name in names_list:
-		if job_names_to_nums.has_key(name):
-			jobslist.append(job_names_to_nums[name])
-		else:
-			sys.stderr.write("Warning: job " + name + " is not a recognized job name in .sge_array_jobnums; cannot hold for this job.\n")
+		found = False
+		for prev_name in job_names_to_nums.keys():
+			if re.search(name, prev_name):
+				jobslist.append(job_names_to_nums[prev_name])
+				found = True
+				
+		if not found:
+			sys.stderr.write("Warning: job " + name + " does not match any job name in .sge_array_jobnums; cannot hold for this job.\n")
+
+		## Previous: before using regex matching
+		#if job_names_to_nums.has_key(name):
+		#	jobslist.append(job_names_to_nums[name])
+		#else:
+		#	sys.stderr.write("Warning: job " + name + " is not a recognized job name in .sge_array_jobnums; cannot hold for this job.\n")
 
 	return jobslist
 
