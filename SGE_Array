@@ -175,6 +175,8 @@ def write_qsub(args):
 	scripth.write(textwrap.dedent('''\
 		#!/usr/bin/env bash
 		#
+		# This file created by SGE_Array
+		#
 		# Export all environment variables
 		#$ -V
 		#
